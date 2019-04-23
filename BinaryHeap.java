@@ -1,3 +1,5 @@
+import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public class BinaryHeap {
 
@@ -28,7 +30,7 @@ public class BinaryHeap {
 	
 	public int remove(){
 		if(size == 0) {
-			throw new NullPointerException();
+			throw new NoSuchElementException();
 		}
 		swap(0, size - 1);
 		--size;
@@ -41,32 +43,24 @@ public class BinaryHeap {
 	
 	private void shiftdown(int pos) {
 		int parent = pos;
-        int rightChild = 2 * parent + 2;
-        int leftChild =  2 * parent + 1; 
-        while(isleaf(pos)) {
-        	//compares if the leftchild is less than the right child
-        	if(data[leftChild] < data[rightChild]) {
-        		swap(parent, leftChild);
-        		parent = leftChild;
-        		leftChild = 2 * parent + 1;
+        while(hasLeftChild(parent)) {
+        	int smallChild = getLeftChildIndex(parent);
+        	//compare the left and right child and see which is smallest
+        	if(hasRightChild(parent) && data[getRightChildIndex(parent)] < data[getLeftChildIndex(parent)])
+        		smallChild = getRightChildIndex(parent);
+        	
+        	if(data[parent] < data[smallChild])
+        		break;
+        	else
+        		swap(parent,smallChild);
         		
-        	}
-        	//compares the right child with the parent
-        	else if(data[parent] > data[rightChild]) {
-        		swap(parent, rightChild);
-        		parent = rightChild;
-        		rightChild = 2 * parent + 2;
-        	}
+        	parent = smallChild;
         		
         }
 	}
 	
 	protected void increaseCapacity() {
-		int[] temp = new int[size * 2];
-		for(int i = 0; i < data.length; i++) {
-			temp[i] = data[i];
-		}
-		data = temp;
+		data = Arrays.copyOf(data, size * 2);
 	}
 	    
 	    private void swap(int pos1, int pos2) {
@@ -77,9 +71,28 @@ public class BinaryHeap {
 		data[pos2] = temp;
     }
 	    
-    private boolean isleaf(int pos) {
-    	return ((pos > size/2) && (pos <= size));
-        }
+    private int getLeftChildIndex(int index) {
+    	return 2 * index + 1;
+    }
+    
+    private int getRightChildIndex(int index) {
+    	return 2 * index + 2;
+    }
+    
+    private int getParentIndex(int index) {
+    	return ((index - 1) / 2);
+    }
+    
+    
+    private boolean hasLeftChild(int index) {
+    	return getLeftChildIndex(index) < size;
+    }
+    
+    private boolean hasRightChild(int index) {
+    	return getRightChildIndex(index) < size;
+    }
+    
+    
     
     public void print() {
     	int i;
@@ -88,7 +101,4 @@ public class BinaryHeap {
     	System.out.println();
         }
 
-    public static void main(String args[]) {
-    	
-    }
 }
